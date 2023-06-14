@@ -81,3 +81,20 @@ func GetRandPass(length int) string {
 	}
 	return string(bytes)
 }
+
+func MergeMaps(map1, map2 map[string]interface{}) map[string]interface{} {
+	// 创建一个新的 map 用于存放结果
+	result := make(map[string]interface{})
+
+	// 将 map1 的内容复制到结果中
+	for k, v := range map1 {
+		result[k] = v
+	}
+
+	// 将 map2 的内容复制到结果中，如果有重复的键，那么会覆盖 map1 中的值
+	for k, v := range map2 {
+		result[k] = v
+	}
+
+	return result
+}
