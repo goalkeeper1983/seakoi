@@ -99,15 +99,19 @@ func init() {
 	//调试模式
 	if TomlConfig.LogConfig.Debug {
 		consoleErrors := zapcore.Lock(os.Stderr)
+		consoleOut := zapcore.Lock(os.Stdout)
 		core = zapcore.NewTee(
-			zapcore.NewCore(zapcore.NewConsoleEncoder(encoderCfg), consoleErrors, zap.DebugLevel),
+			zapcore.NewCore(zapcore.NewConsoleEncoder(encoderCfg), consoleErrors, zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+				return lvl >= zap.ErrorLevel // 错误级别以上写入stderr
+			})),
+			zapcore.NewCore(zapcore.NewConsoleEncoder(encoderCfg), consoleOut, zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+				return lvl < zap.ErrorLevel // info级别以下写入stdout
+			})),
 			zapcore.NewCore(zapcore.NewConsoleEncoder(encoderCfg), w, zap.DebugLevel),
 		)
 	} else {
 		core = zapcore.NewCore(
-			zapcore.NewConsoleEncoder(encoderCfg), // zapcore.NewJSONEncoder(encoderCfg) //json格式
-			w,
-			zap.DebugLevel,
+			zapcore.NewConsoleEncoder(encoderCfg), w, zap.DebugLevel,
 		)
 	}
 	Log = zap.New(core, zap.AddCaller())
