@@ -16,5 +16,8 @@ func CreatePostgreSQLConnect(option ...string) *gorm.DB {
 	if err != nil {
 		tools.Log.Panic(tools.RunFuncName(), zap.Any("err", err.Error()))
 	}
+	if err = db.Exec("select 1").Error; err != nil {
+		tools.Log.Panic(tools.RunFuncName(), zap.Any("err", err.Error()))
+	}
 	return db
 }
