@@ -16,8 +16,15 @@ func CreatePostgreSQLConnect(option ...string) *gorm.DB {
 	if err != nil {
 		tools.Log.Panic(tools.RunFuncName(), zap.Any("err", err.Error()))
 	}
-	if err = db.Exec("SELECT * FROM pg_extension").Error; err != nil {
+	var results []map[string]interface{}
+	if err = db.Raw("SELECT Version()").Scan(&results).Error; err != nil {
 		tools.Log.Panic(tools.RunFuncName(), zap.Any("err", err.Error()))
 	}
+	tools.Log.Info(tools.RunFuncName(), zap.Any("version", results))
+
+	if err = db.Raw("SELECT * from pg_extension").Scan(&results).Error; err != nil {
+		tools.Log.Panic(tools.RunFuncName(), zap.Any("err", err.Error()))
+	}
+	tools.Log.Info(tools.RunFuncName(), zap.Any("pg_extension", results))
 	return db
 }
