@@ -44,6 +44,6 @@ func main() {
 
 	RedisInstance = new(redisClientInstance)
 	RedisInstance.GetRedisClient("127.0.0.1", "6379", "123456", "1")
-	
+
 	//log 输出
 }
