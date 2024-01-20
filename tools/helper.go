@@ -8,8 +8,10 @@ import (
 	"time"
 )
 
+var rnd *rand.Rand
+
 func init() {
-	rand.NewSource(time.Now().UnixNano())
+	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 func Max(a, b int) int {
@@ -45,14 +47,14 @@ func GetRandInt(a, b int) int {
 	if a > b {
 		a, b = b, a
 	}
-	return a + rand.Intn(b-a+1)
+	return a + rnd.Intn(b-a+1)
 }
 
 func GetRandInt32(a, b int32) int32 {
 	if a > b {
 		a, b = b, a
 	}
-	return a + rand.Int31n(b-a+1)
+	return a + rnd.Int31n(b-a+1)
 }
 
 var randStringPool = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "N", "M", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
