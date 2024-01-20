@@ -4,7 +4,9 @@ import (
 	"github.com/goalkeeper1983/seakoi/mysqlConnect"
 	"github.com/goalkeeper1983/seakoi/postgreSQLConnect"
 	"github.com/goalkeeper1983/seakoi/redisConnect"
+	"github.com/goalkeeper1983/seakoi/tools"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"sync"
 
 	"gorm.io/gorm"
@@ -55,6 +57,7 @@ func (This *pgsqlClientInstance) GetPgsqlClient(option ...string) *gorm.DB {
 var PgsqlInstance *pgsqlClientInstance
 
 func main() {
+	tools.Log.Info(tools.RunFuncName(), zap.Any("info", tools.GetRandInt(10, 20)))
 	//MysqlDbInstance = new(dbClientInstance)
 	//MysqlDbInstance.GetMysqlClient("root", "123456", "127.0.0.1", "3306", "dbname", "utf8mb4")
 	//

@@ -9,8 +9,11 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"log"
+	"net"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -26,7 +29,22 @@ func MD5(str string) string {
 }
 
 func UuidUint64() uint64 {
-	flake := sonyflake.NewSonyflake(sonyflake.Settings{})
+	f := func() (uint16, error) {
+		var id uint16
+		ifts, err := net.Interfaces()
+		if err != nil {
+			return 0, err
+		}
+		for _, ift := range ifts {
+			if len(ift.HardwareAddr) >= 6 {
+				id = uint16(ift.HardwareAddr[4])<<8 + uint16(ift.HardwareAddr[5])
+				return id, nil
+			}
+		}
+		return 0, fmt.Errorf("no suitable interface found")
+	}
+
+	flake := sonyflake.NewSonyflake(sonyflake.Settings{StartTime: time.Now(), MachineID: f})
 	if uid, err := flake.NextID(); err != nil {
 		Log.Error(err.Error())
 		return 0
