@@ -5,10 +5,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/sony/sonyflake"
 	"net"
+	"sync"
 	"time"
 )
 
-func UuidUint64() uint64 {
+var (
+	uuidUint64Pool sync.Pool
+	settings       sonyflake.Settings
+)
+
+func init() {
 	f := func() (uint16, error) {
 		var id uint16
 		ifts, err := net.Interfaces()
@@ -23,8 +29,17 @@ func UuidUint64() uint64 {
 		}
 		return 0, fmt.Errorf("no suitable interface found")
 	}
+	settings = sonyflake.Settings{StartTime: time.Now(), MachineID: f}
+	uuidUint64Pool = sync.Pool{
+		New: func() interface{} {
+			return sonyflake.NewSonyflake(settings)
+		},
+	}
+	uuid.EnableRandPool()
+}
 
-	flake := sonyflake.NewSonyflake(sonyflake.Settings{StartTime: time.Now(), MachineID: f})
+func UuidUint64() uint64 {
+	flake := uuidUint64Pool.Get().(*sonyflake.Sonyflake)
 	if uid, err := flake.NextID(); err != nil {
 		Log.Error(err.Error())
 		return 0
@@ -65,7 +80,17 @@ func UuidV5(data []byte) string {
 }
 
 func UuidV4() string {
+	uuid.EnableRandPool()
 	u, err := uuid.NewRandom()
+	if err != nil {
+		Log.Error(err.Error())
+		return ""
+	}
+	return u.String()
+}
+
+func UuidV7() string {
+	u, err := uuid.NewV7()
 	if err != nil {
 		Log.Error(err.Error())
 		return ""
