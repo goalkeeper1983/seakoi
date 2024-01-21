@@ -9,16 +9,9 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"log"
-	"net"
-	"time"
-
-	"go.uber.org/zap"
-
-	go_uuid "github.com/satori/go.uuid"
-	"github.com/sony/sonyflake"
 )
 
 // MD5 加密
@@ -26,35 +19,6 @@ func MD5(str string) string {
 	h := md5.New()
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-func UuidUint64() uint64 {
-	f := func() (uint16, error) {
-		var id uint16
-		ifts, err := net.Interfaces()
-		if err != nil {
-			return 0, err
-		}
-		for _, ift := range ifts {
-			if len(ift.HardwareAddr) >= 6 {
-				id = uint16(ift.HardwareAddr[4])<<8 + uint16(ift.HardwareAddr[5])
-				return id, nil
-			}
-		}
-		return 0, fmt.Errorf("no suitable interface found")
-	}
-
-	flake := sonyflake.NewSonyflake(sonyflake.Settings{StartTime: time.Now(), MachineID: f})
-	if uid, err := flake.NextID(); err != nil {
-		Log.Error(err.Error())
-		return 0
-	} else {
-		return uid
-	}
-}
-
-func Uuid() string {
-	return go_uuid.NewV4().String()
 }
 
 func ZlibUnzip(src []byte) []byte {
@@ -73,7 +37,10 @@ func ZlibZip(src []byte) []byte {
 	if _, err := w.Write(src); err != nil {
 		log.Panicln(err.Error())
 	}
-	w.Close()
+	err := w.Close()
+	if err != nil {
+		return nil
+	}
 	return in.Bytes()
 }
 
