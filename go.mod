@@ -1,6 +1,6 @@
 module github.com/goalkeeper1983/seakoi
 
-go 1.21.5
+go 1.20
 
 require (
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
