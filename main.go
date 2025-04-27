@@ -1,11 +1,13 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/goalkeeper1983/seakoi/mysqlConnect"
 	"github.com/goalkeeper1983/seakoi/postgreSQLConnect"
 	"github.com/goalkeeper1983/seakoi/redisConnect"
+	"github.com/goalkeeper1983/seakoi/tools"
 	"github.com/redis/go-redis/v9"
-	"sync"
 
 	"gorm.io/gorm"
 )
@@ -53,5 +55,5 @@ func (This *pgsqlClientInstance) GetPgsqlClient(option ...string) *gorm.DB {
 }
 
 func main() {
-
+	tools.Log.Info("test")
 }

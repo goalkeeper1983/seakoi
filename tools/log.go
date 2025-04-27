@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"strings"
@@ -40,14 +42,17 @@ var (
 )
 
 func defaultConfig() *logConfig {
+	exePath, _ := os.Executable()
+	exePath = filepath.Dir(exePath)
+	fileName := path.Join(exePath, "log/default.log")
 	return &logConfig{
-		Debug:       true,              //是否开启调试
-		MaxSize:     1024,              //日志文件最大多少兆
-		MaxDays:     29,                //日志文件保留天数
-		MaxBackups:  30,                //保留文件数
-		FileName:    "log/default.log", //日志名字
-		Compress:    true,              //日志生成压缩包,大幅降低磁盘空间,必要时使用
-		RotateByDay: false,             //每天轮转一次,如果开启,maxBackups的值需要>=maxDays
+		Debug:       true,     //是否开启调试
+		MaxSize:     1024,     //日志文件最大多少兆
+		MaxDays:     29,       //日志文件保留天数
+		MaxBackups:  30,       //保留文件数
+		FileName:    fileName, //日志名字
+		Compress:    true,     //日志生成压缩包,大幅降低磁盘空间,必要时使用
+		RotateByDay: false,    //每天轮转一次,如果开启,maxBackups的值需要>=maxDays
 	}
 }
 
